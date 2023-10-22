@@ -1,0 +1,14 @@
+{
+  "name": "fatepw",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {},
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "description": "The full-stack project for FatePW",
+  "main": "index.js",
+  "keywords": [],
+  "author": "BigBosss",
+  "license": "MIT"
+}
