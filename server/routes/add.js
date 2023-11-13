@@ -3,52 +3,109 @@ var router = express.Router();
 const sqlite3 = require('sqlite3').verbose();
 const DBPATH = '/home/lily/code/FatePW/db/fate.db';
 
-router.post('/category', async (req, res, next) => {
-
-  // console.log('dirname:', __dirname);
-
+router.post('/labels', async (req, res, next) => {
   const db = await new sqlite3.Database(DBPATH);
-  // console.log(req.body);
-  // await db.all(`SELECT * FROM categories;`, (err, rows) => {
-  //   if (err) {
-  //     console.error(err);
-  //   }
-  //   rows.forEach(r => { console.log('existed:', r) });
-  // })
-  const INSERT_CATEGORY = `INSERT INTO categories (category, kook_role_id) VALUES ("${req.body.category}", ${req.body.kookRoleId})`;
-  await db.run(INSERT_CATEGORY, err => {
-    if (err) {
-      console.error(`Error inserting add/category with category: ${req.body.category} and kook_role_id: ${req.body.kookRoleId}`);
-      res.sendStatus(400);
-    }
-  })
-  await db.close(err => {
-    if (err) {
-      console.error(err.message);
-      res.sendStatus(500);
-    }
-  });
-  res.sendStatus(200);
+
+  try {
+    const INSERT_LABEL = `INSERT INTO labels (label, kook_role_id) VALUES ("${req.body.label}", ${req.body.kookRoleId})`;
+    await db.run(INSERT_LABEL, async (err) => {
+      if (err) {
+        console.error(`Error inserting add/label`);
+        res.status(400).json({ error: err.message });
+      } else {
+        await db.close((closeErr) => {
+          if (closeErr) {
+            console.error('Error closing database:', closeErr.message);
+            res.sendStatus(500);
+          } else {
+            res.sendStatus(200);
+          }
+        });
+      }
+    })
+  } catch (error) {
+    console.error('Error in try-catch block:', error.message);
+    res.sendStatus(500);
+  }
+
 })
 
-router.post('/pw', async (req, res, next) => {
-  console.log('reaching /pw');
-  const db = await new sqlite3.Database(DBPATH);
-  const INSERT_CATEGORY = `INSERT INTO peiwan (display_id, kook_id, name, introduction) VALUES (${req.body.displayId}, ${req.body.kookId}, "${req.body.name}", "${req.body.introduction}")`;
+router.post('/peiwan', async (req, res, next) => {
+  const db = new sqlite3.Database(DBPATH);
 
-  await db.run(INSERT_CATEGORY, err => {
-    if (err) {
-      console.error(`Error inserting add/pw with displayId: ${req.body.displayId}; kook_id: ${req.body.kookId}; name:${req.body.name}; introduction:${req.body.introduction}`);
-      res.sendStatus(400);
-    }
-  })
-  await db.close(err => {
-    if (err) {
-      console.error(err.message);
-      res.sendStatus(500);
-    }
-  });
-  res.sendStatus(200);
+  try {
+    const kookId = req.body.kookId;
+    const displayId = req.body.displayId;
+    const name = req.body.name;
+    const introduction = req.body.introduction;
+    const location = req.body.location;
+    const contactInfo = req.body.contactInfo;
+    const pictureUrl = req.body.pictureUrl;
+    const timbre = req.body.timbre;
+    const label = req.body.label;
+
+    const INSERT_PEIWAN = `
+      INSERT INTO peiwan (kook_id, display_id, name, introduction, location, contact_info, picture_url, timbre, label)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    await db.run(
+      INSERT_PEIWAN,
+      [kookId, displayId, name, introduction, location, contactInfo, pictureUrl, timbre, label],
+      async (err) => {
+        if (err) {
+          console.error('Error inserting peiwan:', err.message);
+          return res.status(400).json({ error: err.message });
+        }
+
+        await db.close((closeErr) => {
+          if (closeErr) {
+            console.error('Error closing database:', closeErr.message);
+            res.sendStatus(500);
+          } else {
+            res.sendStatus(200);
+          }
+        });
+
+      }
+    );
+  } catch (error) {
+    console.error('Error in try-catch block:', error.message);
+    res.sendStatus(500);
+  }
+});
+
+router.post('/games_and_price', async (req, res, next) => {
+
+
+  const db = await new sqlite3.Database(DBPATH);
+  const game = req.body.game;
+  const price = req.body.price;
+  const main_game = req.body.is_main_game;
+  const kook_id = req.body.kook_id;
+
+  try {
+    const INSERT_LABEL = `INSERT INTO games_and_price (game, price, main_game, kook_id) VALUES (?, ?, ?, ?)`;
+    await db.run(INSERT_LABEL, [game, price, main_game, kook_id], async (err) => {
+      if (err) {
+        console.error(`Error inserting games_and_price`);
+        res.status(400).json({ error: err.message });
+      } else {
+        await db.close((closeErr) => {
+          if (closeErr) {
+            console.error('Error closing database:', closeErr.message);
+            res.sendStatus(500);
+          } else {
+            res.sendStatus(200);
+          }
+        });
+      }
+    })
+  } catch (error) {
+    console.error('Error in try-catch block:', error.message);
+    res.sendStatus(500);
+  }
+
 })
 
 module.exports = router;
