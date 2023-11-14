@@ -40,7 +40,7 @@ class App extends Component {
   }
 
   displayLabelApiResponse() {
-    if (this.state.apiResponseLabel) {
+    if (this.state.apiResponseLabel && this.state.apiResponseLabel.data) {
       if (this.state.selectedLabel === "") {
         this.setState({ selectedLabel: this.state.apiResponseLabel.data[0].label })
       }
