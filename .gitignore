@@ -2,3 +2,4 @@ node_modules
 draft.md
 db
 .env
+ecosystem.config.js
